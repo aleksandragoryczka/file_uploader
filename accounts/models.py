@@ -1,25 +1,31 @@
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 import uuid
+from images.models import ThumbnailSize
 
 
-class UserAccount(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    accountTier = models.ForeignKey(
-        'AccountTier', on_delete=models.CASCADE
+class UserAccount(AbstractUser):
+    account_tier = models.ForeignKey(
+        'AccountTier', on_delete=models.SET_NULL, null=True
     )
+
+    def __str__(self):
+        try:
+            return f"{self.id} {self.username} - {self.account_tier.name}"
+        except AttributeError:
+            return self.username
 
 
 class AccountTier(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     is_original_file_link = models.BooleanField(default=False)
     is_expiring_link = models.BooleanField(default=False)
-    thumbnailSizes = models.ManyToManyField(
-        'ThumbnailSize',
+    thumbnail_sizes = models.ManyToManyField(
+        'images.ThumbnailSize',
+        related_name='account_tier',
     )
 
-
-class ThumbnailSize(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    height = models.IntegerField()
+    def __str__(self):
+        return self.name

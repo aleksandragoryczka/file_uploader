@@ -1,0 +1,16 @@
+[
+  {
+    "model": "images.ThumbnailSize",
+    "pk": 1,
+    "fields": {
+      "height": 200
+    }
+  },
+  {
+    "model": "images.ThumbnailSize",
+    "pk": 2,
+    "fields": {
+      "height": 400
+    }
+  }
+]

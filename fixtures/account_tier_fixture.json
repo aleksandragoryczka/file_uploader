@@ -1,0 +1,32 @@
+[
+  {
+    "model": "accounts.accounttier",
+    "pk": 1,
+    "fields": {
+      "name": "Basic",
+      "thumbnail_sizes": [1],
+      "is_original_file_link": false,
+      "is_expiring_link": false
+    }
+  },
+  {
+    "model": "accounts.accounttier",
+    "pk": 2,
+    "fields": {
+      "name": "Premium",
+      "thumbnail_sizes": [1,2],
+      "is_original_file_link": true,
+      "is_expiring_link": false
+    }
+  },
+  {
+    "model": "accounts.accounttier",
+    "pk": 3,
+    "fields": {
+      "name": "Enterprise",
+      "thumbnail_sizes": [1,2],
+      "is_original_file_link": true,
+      "is_expiring_link": true
+    }
+  }
+]
