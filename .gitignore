@@ -1,9 +1,15 @@
+# Ignore IDE-specific directories
 .idea/
+.vscode/
 
+# Ignore Python bytecode and cache files
 __pycache__/
 
+# Ignore virtual environment
 .venv/
 
+# Ignore user media files
 media/
 
+# ignore database file
 db.sqlite3
