@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from images.utils.config import MIN_EXPIRATION_TIME_SEC, MAX_EXPIRATION_TIME_SEC, VALID_IMAGE_FORMATS
+from file_uploader.settings import MIN_EXPIRATION_TIME_SEC, MAX_EXPIRATION_TIME_SEC, VALID_IMAGE_FORMATS
 
 
 def validate_expiration_time_sec(value):
@@ -17,3 +17,4 @@ def validate_image_format(image):
     raise serializers.ValidationError(
         {"error": f"Image format must be one of {VALID_IMAGE_FORMATS}"}
     )
+

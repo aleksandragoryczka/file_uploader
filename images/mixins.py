@@ -3,7 +3,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from file_uploader import settings
 from images.models import ExpiringLink, Image
-from images.utils.config import DEFAULT_EXPIRATION_TIME_SEC
+from file_uploader.settings import DEFAULT_EXPIRATION_TIME_SEC
 
 
 class ExpiringLinkMixin:

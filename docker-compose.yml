@@ -5,8 +5,15 @@ services:
     volumes:
       - .:/code
       - ./fixtures:/fixtures
-    command: bash -c "python manage.py flush --noinput && python manage.py migrate && python manage.py remove_expired_links && \
-      python manage.py loaddata thumbnail_size_fixture.json && python manage.py \
-      loaddata account_tier_fixture.json && python manage.py add_admin && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py remove_expired_links && \
+      python manage.py loaddata fixtures/thumbnail_size_fixture.json && python manage.py \
+      loaddata fixtures/account_tier_fixture.json && python manage.py add_admin && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
