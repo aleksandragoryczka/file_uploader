@@ -23,7 +23,6 @@ class ImageCreateSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user
         image_instance = Image(**validated_data)
         image_instance.save()
-        image_instance.create_urls()
         return image_instance
 
     def to_representation(self, instance):
@@ -36,24 +35,20 @@ class ImageCreateSerializer(serializers.ModelSerializer):
 class ExpiringLinkCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpiringLink
-        fields = ['expiration_time_sec', 'image']
+        fields = ['image', 'expiration_time_sec']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].queryset = Image.objects.filter(user=self.context['request'].user)
 
 
 class ExpiringLinkListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpiringLink
-        fields = ['id', 'expiration_time_sec', 'link', 'created_at']
-
-    def validate(self, **kwargs):
-        if Image.objects.get(pk=self.kwargs['image_id']).user == self.request.user:
-            return True
-        raise serializers.ValidationError(
-            {"error": "You aren't the owner of this image"}
-        )
+        fields = ['id', 'expiration_time_sec', 'link', 'expiration_time']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['created_at'] = instance.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        representation['expiration_time'] = instance.expiration_time.strftime("%Y-%m-%d %H:%M:%S")
         return representation
-
 

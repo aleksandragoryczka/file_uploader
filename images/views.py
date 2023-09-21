@@ -6,25 +6,23 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from file_uploader import settings
-from images.mixins import ExpiringLinkMixin
-from images.models import Image
+from images.dropbox_api import DropboxAPI
+from images.models import Image, ExpiringLink
 from images.serializers import ImageListSerializer, ImageCreateSerializer, ExpiringLinkCreateSerializer, \
     ExpiringLinkListSerializer
 
 
-class CachingBaseListApiView(ListAPIView):
-    @method_decorator(cache_page(settings.CACHE_TTL))
-    @method_decorator(vary_on_cookie)
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
-class ListImageView(CachingBaseListApiView):
+class ListImageView(ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ImageListSerializer
 
     def get_queryset(self):
         return Image.objects.filter(user=self.request.user).all()
+
+    @method_decorator(cache_page(settings.CACHE_TTL, key_prefix="images"))
+    @method_decorator(vary_on_cookie)
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class CreateImageView(CreateAPIView):
@@ -33,32 +31,38 @@ class CreateImageView(CreateAPIView):
     queryset = Image.objects.all()
 
 
-class CreateExpiringLinkView(ExpiringLinkMixin, CreateAPIView):
+class CreateExpiringLinkView(CreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ExpiringLinkCreateSerializer
-
-    def get_queryset(self):
-        return Image.objects.filter(pk=self.request.data('image_id')).all()
+    queryset = Image.objects.all()
 
     def create(self, request, *args, **kwargs):
-        created = super().create(request, *args, **kwargs)
-        created.data['id'] = self.link.id
-        img = Image.objects.get(pk=created.data['image'])
-        # dbx = Dropbox(settings.DROPBOX_OAUTH2_REFRESH_TOKEN)
-        # r = dbx.sharing_create_shared_link_with_settings('/images/user_2/Untitled_2.png')
-        # print(r.url)
-        # created.data['link'] = CustomDropboxStorage().generate_expiring_link(img, self.request.data.get('expiration_time_sec'))
-        # print(created.data['link'])
-
-        created.data['created_at'] = self.link.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        return created
+        response = super().create(request, *args, **kwargs)
+        response.data["image_id"] = response.data['image']
+        response.data['image'] = Image.objects.get(pk=response.data['image']).image.name
+        response.data['link'] = self.expiring_link[0]
+        response.data['expiration_time'] = self.expiring_link[1].strftime("%Y-%m-%d %H:%M:%S")
+        return response
 
     def perform_create(self, serializer):
-        self.link = ExpiringLinkMixin.create_expiring_link(self, self.request.data.get('image'),
-                                                           int(self.request.data.get('expiration_time_sec')))
+        image_instance = Image.objects.get(pk=self.request.data['image'])
+        try:
+            generated_link = DropboxAPI().create_expiring_link('/' + image_instance.image.name,
+                                                      self.request.data.get('expiration_time_sec'))
+            ExpiringLink.objects.create(link=generated_link[0],
+                                        expiration_time_sec=self.request.data.get('expiration_time_sec'),
+                                        image=image_instance,
+                                        expiration_time=generated_link[1])
+            self.expiring_link = generated_link
+
+        except Exception as e:
+            raise serializers.ValidationError(
+                {"error": f"Expiring link for that image already exists. "
+                          f"Fetch it with url: http://127.0.0.1:8000/api/images/expiring-link/{image_instance.pk}"}
+            )
 
 
-class ListExpiringLinkView(CachingBaseListApiView):
+class ListExpiringLinkView(ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ExpiringLinkListSerializer
 
@@ -76,4 +80,4 @@ class ListExpiringLinkView(CachingBaseListApiView):
     def get_queryset(self):
         image_id = self.kwargs['image_id']
         if self.validate(image_id):
-            return ExpiringLinkMixin.get_non_expired_links(self, image_id)
+            return ExpiringLink.objects.filter(image=image_id).all()

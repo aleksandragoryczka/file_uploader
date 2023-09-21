@@ -5,6 +5,5 @@ from rest_framework.serializers import CharField
 
 class LoginSerializer(serializers.LoginSerializer):
     email = None
-    #password = None
 
 

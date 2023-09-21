@@ -5,15 +5,29 @@ services:
     volumes:
       - .:/code
       - ./fixtures:/fixtures
-    command: bash -c "python manage.py migrate && python manage.py remove_expired_links && \
-      python manage.py loaddata fixtures/thumbnail_size_fixture.json && python manage.py \
-      loaddata fixtures/account_tier_fixture.json && python manage.py add_admin && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py loaddata fixtures/thumbnail_size_fixture.json && python manage.py \
+      loaddata fixtures/account_tier_fixture.json && python manage.py add_admin && \
+      python manage.py remove_expired_links && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     depends_on:
       - redis
-
   redis:
     image: "redis:latest"
+    volumes:
+      - redis:/var/lib/redis
+      - redis-config:/usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
+  tests:
+    build: .
+    command: bash -c "python manage.py test"
+    volumes:
+      - .:/code
+      - ./fixtures:/fixtures
+    depends_on:
+      - redis
+
+volumes:
+  redis:
+  redis-config:

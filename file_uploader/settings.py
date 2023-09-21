@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-x(!3&5a*10-c66)p&#%%#qpwik2ron-=_i9-egpb^y&t#fak)1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Application definition
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'allauth',
     'allauth.account',
+    'sorl.thumbnail'
 ]
 
 MIDDLEWARE = [
@@ -128,6 +129,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Image uploading
 
+TEST_ROOT = os.path.join(BASE_DIR, 'images/tests/test-assets')
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
@@ -169,11 +172,11 @@ DEFAULT_FILE_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
 DROPBOX_APP_KEY = 'g1fobrr6zo3uh0k'
 DROPBOX_APP_SECRET = 'i1lu2041q42tp9u'
 # sl.BmUyamWVNS1JZAs9UMDbO9aFcIN8kaWtUjKW8lmrKCGLlZlM4iHtc3FIKLqSD6rl-aKy5aJu7FRGPTiXK1bHPzujShkpjfv3MDqvcOTdeIHI0CoWA1C1XHPGjUz_pCcwuGa7HAo8KeWULuxdN9pOzIk
-DROPBOX_ACCESS_TOKEN = "sl.BmWjKEWha7ZfqzbH7sRodqCc5ik3VOzKMRJ9887KWsP7-XhcN__Et2enNF6bm9FM6__cPAtOqjg4bQMpVuQ0P4NoMQKFcZpdCq_XtB0_muvZGPCOBKe90m5o92jjNTslTz1tN2XCbZ7ddUfxQfQpuu0"
+DROPBOX_ACCESS_TOKEN = "sl.BmYffiAZtK8gRhE6MpQKI2pzSVF_l2Wg-zynpeADhsQhYiUGQm5aMz9n6c0IqIoG5WuZAYIWCXQz1ynTM4aL8ynJGiiGxGyV6kMabb7zah5vqqqdCLAZ8AqXpruYZxiywAbxeEs66WZxMTCTJmbMc98"
 # DROPBOX_OAUTH2_TOKEN = 'sl.BmVH_C0Di0f4xZyc9jZ4TzOtvA2BcpMNZqb_SDHqiDvBThU74eQomqiPoCyScGcHVBIm07oN8EooZ_ustcrD-CGJZ1AscLmT4hX-N1PVa5ZaTRyNMC-uc4sQmkcwkqanYwXlOJT4AGIGdVM'
-DROPBOX_OAUTH2_REFRESH_TOKEN = "YTt2-12EWPgAAAAAAAAAAZFJf_awvWHV2pU24I5IzWl0O7iLYauSGI4z61Z8FNrI"
-DROPBOX_API_BASE_URL = 'https://content.dropboxapi.com/2/'
-DROPBOX_TIMEOUT = 50
+DROPBOX_OAUTH2_REFRESH_TOKEN = "v3fgMT4jidEAAAAAAAAAAdtjTfAoEZZneG_ttO0NzpFh57o-mVQzrdM63lVgJNQM"
+# DROPBOX_API_BASE_URL = 'https://content.dropboxapi.com/2/'
+# DROPBOX_TIMEOUT = 50
 
 # Redis caching
 CACHES = {
@@ -190,3 +193,11 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 CACHE_TTL = 60 * 2
+
+THUMBNAIL_PRESERVE_FORMAT = True
+THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.redis_kvstore.KVStore'
+#THUMBNAIL_STORAGE = 'storages.backends.redis.RedisStore'
+#THUMBNAIL_STORAGE = CACHES.get('default').get('BACKEND')
+THUMBNAIL_REDIS_PORT = 6379
+THUMBNAIL_REDIS_HOST = 'redis'
+THUMBNAIL_REDIS_DB = 1
