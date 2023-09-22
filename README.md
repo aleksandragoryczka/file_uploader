@@ -93,6 +93,6 @@ I use Sorl Thumbnail to generate and cache image thumbnails.
 
 ## Live Preview
 
-![live-preview](live-preview.gif)
+![live-preview](video.gif)
 
 
