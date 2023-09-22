@@ -3,16 +3,15 @@
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Prerequisites](#prerequisites)
-3. [Setting Up](#setting-up)
+1. [Prerequisites](#prerequisites)
+2. [Setting Up](#setting-up)
    - [Testing](#testing)
-4. [API Endpoints](#api-endpoints)
-5. [Performance Optimization](#performance-optimization)
+3. [API Endpoints](#api-endpoints)
+4. [Performance Optimization](#performance-optimization)
    - [Using Dropbox for Storage](#using-dropbox-for-storage)
    - [Redis Caching](#redis-caching)
    - [Sorl Thumbnail Caching](#sorl-thumbnail-caching)
-6. [Live Preview](#live-preview)
+5. [Live Preview](#live-preview)
 
 ## Prerequisites
 
